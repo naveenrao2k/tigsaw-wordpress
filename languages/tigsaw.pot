@@ -1,0 +1,228 @@
+# Copyright (C) 2025 Tigsaw
+# This file is distributed under the GPLv2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Tigsaw 1.0\n"
+"Report-Msgid-Bugs-To: https://tigsaw.com/contact\n"
+"POT-Creation-Date: 2025-10-27 00:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"X-Generator: Manual\n"
+
+#: tigsaw.php
+msgid "You do not have sufficient permissions to access this page."
+msgstr ""
+
+#: tigsaw.php
+msgid "Settings"
+msgstr ""
+
+#: tigsaw.php
+msgid "Documentation"
+msgstr ""
+
+#: tigsaw.php
+msgid "Support"
+msgstr ""
+
+#: tigsaw.php
+msgid "Tigsaw - AI + Visual Editor"
+msgstr ""
+
+#: tigsaw.php
+msgid "Smart Script Integration"
+msgstr ""
+
+#: tigsaw.php
+msgid "Seamlessly verify domain connectivity and integrate smart script into your WordPress site"
+msgstr ""
+
+#: tigsaw.php
+msgid "Version"
+msgstr ""
+
+#: tigsaw.php
+msgid "Status"
+msgstr ""
+
+#: tigsaw.php
+msgid "Active"
+msgstr ""
+
+#: tigsaw.php
+msgid "Inactive"
+msgstr ""
+
+#: tigsaw.php
+msgid "Visit Tigsaw.com"
+msgstr ""
+
+#: tigsaw.php
+msgid "Site Domain"
+msgstr ""
+
+#: tigsaw.php
+msgid "Container Configuration"
+msgstr ""
+
+#: tigsaw.php
+msgid "Smart Script Active"
+msgstr ""
+
+#: tigsaw.php
+msgid "Container ID:"
+msgstr ""
+
+#: tigsaw.php
+msgid "Change Container"
+msgstr ""
+
+#: tigsaw.php
+msgid "Remove Script"
+msgstr ""
+
+#: tigsaw.php
+msgid "Change Container ID"
+msgstr ""
+
+#: tigsaw.php
+msgid "Current Container:"
+msgstr ""
+
+#: tigsaw.php
+msgid "Fetch Available Containers"
+msgstr ""
+
+#: tigsaw.php
+msgid "Enter Manually"
+msgstr ""
+
+#: tigsaw.php
+msgid "Manual Container ID Entry"
+msgstr ""
+
+#: tigsaw.php
+msgid "Use This ID"
+msgstr ""
+
+#: tigsaw.php
+msgid "Enter your Tigsaw container ID for testing purposes."
+msgstr ""
+
+#: tigsaw.php
+msgid "Fetching available containers from Tigsaw..."
+msgstr ""
+
+#: tigsaw.php
+msgid "No Container Found"
+msgstr ""
+
+#: tigsaw.php
+msgid "No container ID found for your domain. Please create one on Tigsaw."
+msgstr ""
+
+#: tigsaw.php
+msgid "Create Container on Tigsaw"
+msgstr ""
+
+#: tigsaw.php
+msgid "Select New Container ID"
+msgstr ""
+
+#: tigsaw.php
+msgid "The new container will be <strong>automatically activated</strong> when you save."
+msgstr ""
+
+#: tigsaw.php
+msgid "Verifying container with Tigsaw..."
+msgstr ""
+
+#: tigsaw.php
+msgid "Activation Failed"
+msgstr ""
+
+#: tigsaw.php
+msgid "Save & Activate New Container"
+msgstr ""
+
+#: tigsaw.php
+msgid "Cancel"
+msgstr ""
+
+#: tigsaw.php
+msgid "Development Environment Detected"
+msgstr ""
+
+#: tigsaw.php
+msgid "Fetch Container ID"
+msgstr ""
+
+#: tigsaw.php
+msgid "Enter Manual Container ID"
+msgstr ""
+
+#: tigsaw.php
+msgid "Select Container ID"
+msgstr ""
+
+#: tigsaw.php
+msgid "The smart script will be <strong>automatically activated</strong> and added to all pages once you save your container selection."
+msgstr ""
+
+#: tigsaw.php
+msgid "Save & Activate Script"
+msgstr ""
+
+#: tigsaw.php
+msgid "Tigsaw v%s"
+msgstr ""
+
+#: tigsaw.php
+msgid "Please select a container ID."
+msgstr ""
+
+#: tigsaw.php
+msgid "Container ID format looks unusual. Continue anyway?\\n\\nTypical format: CW172SE6 (6-12 alphanumeric characters)"
+msgstr ""
+
+#: tigsaw.php
+msgid "Please enter a valid container ID."
+msgstr ""
+
+#: tigsaw.php
+msgid "Are you sure you want to remove the Tigsaw Smart Script? This will disconnect your site from the Tigsaw platform."
+msgstr ""
+
+#: tigsaw.php
+msgid "-- Select a Container --"
+msgstr ""
+
+#: tigsaw.php
+msgid " (Manual)"
+msgstr ""
+
+#: tigsaw.php
+msgid "Container verification failed"
+msgstr ""
+
+#: tigsaw.php
+msgid "Unable to verify container with Tigsaw. "
+msgstr ""
+
+#: tigsaw.php
+msgid "Container not found."
+msgstr ""
+
+#: tigsaw.php
+msgid "Internal server error. Please try again later."
+msgstr ""
+
+#: tigsaw.php
+msgid "Please check your connection and try again."
+msgstr ""
