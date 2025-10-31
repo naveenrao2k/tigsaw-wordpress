@@ -1,0 +1,17 @@
+# Node modules
+node_modules/
+
+# Generated CSS
+# assets/css/tailwind.min.css
+# assets/css/tailwind.css
+
+# NPM
+package-lock.json
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

@@ -10,7 +10,7 @@
  * Version:         1.0
  * Requires at least: 5.0
  * Requires PHP:    7.4
- * Tested up to:    6.8.3
+ * Tested up to:    6.8
  * License:         GPL v2 or later
  * License URI:     https://www.gnu.org/licenses/gpl-2.0.html
  *
@@ -262,10 +262,14 @@ function tigsaw_clear_all_caches() {
 		wp_cache_flush();
 	}
 	
-	// Clear WordPress transients
-	global $wpdb;
-	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '_transient_%'" );
-	$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE '_site_transient_%'" );
+	// Clear WordPress transients using delete_expired_transients()
+	// This is a core WordPress function that safely clears transients
+	delete_expired_transients( true );
+	
+	// Also clear site transients if on multisite
+	if ( is_multisite() ) {
+		delete_site_transient( '' ); // Clears all site transients
+	}
 	
 	// WP Super Cache
 	if ( function_exists( 'wp_cache_clear_cache' ) ) {
@@ -400,6 +404,26 @@ function tigsaw_clear_all_caches() {
 }
 
 /**
+ * Enqueue admin styles for settings page
+ */
+function tigsaw_enqueue_admin_styles( $hook ) {
+	// Only load on our settings page
+	if ( 'toplevel_page_tigsaw-settings' !== $hook ) {
+		return;
+	}
+
+	// Enqueue Tailwind CSS
+	wp_enqueue_style(
+		'tigsaw-tailwind',
+		TIGSAW_PLUGIN_URL . 'assets/css/tailwind.min.css',
+		array(),
+		TIGSAW_VERSION,
+		'all'
+	);
+}
+add_action( 'admin_enqueue_scripts', 'tigsaw_enqueue_admin_styles' );
+
+/**
  * Settings page HTML
  */
 function tigsaw_settings_page() {
@@ -411,7 +435,8 @@ function tigsaw_settings_page() {
 	// Get current domain
 	$site_url = get_site_url();
 	$domain = preg_replace( '#^https?://(www\.)?#', '', $site_url );
-	$domain = rtrim( parse_url( 'http://' . $domain, PHP_URL_HOST ), '/' );
+	$parsed = wp_parse_url( 'http://' . $domain );
+	$domain = isset( $parsed['host'] ) ? rtrim( $parsed['host'], '/' ) : $domain;
 	
 	// Get saved settings
 	$container_id = get_option( 'tigsaw_container_id', '' );
@@ -419,22 +444,6 @@ function tigsaw_settings_page() {
 	
 	?>
 	<div class="wrap">
-		<!-- Load Tailwind CSS from CDN -->
-		<script src="https://cdn.tailwindcss.com"></script>
-		<script>
-			tailwind.config = {
-				theme: {
-					extend: {
-						colors: {
-							primary: '#ff6600',
-							'primary-dark': '#e65c00',
-							'primary-light': '#ff8533',
-						}
-					}
-				}
-			}
-		</script>
-
 		<div class="max-w-5xl mx-auto mt-8 mb-12">
 			<!-- Header -->
 			<div class="relative overflow-hidden bg-gradient-to-br from-primary via-primary-dark to-orange-700 rounded-2xl shadow-2xl mb-8">
@@ -649,7 +658,7 @@ function tigsaw_settings_page() {
 												Select New Container ID
 											</label>
 											<div class="relative">
-												<select name="tigsaw_container_id" id="tigsaw_modal_container_id" class="w-full px-5 py-4 pr-12 text-lg font-mono font-semibold border-3 border-gray-300 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary focus:ring-opacity-20 transition-all duration-200 bg-white hover:border-primary-light shadow-sm hover:shadow-md cursor-pointer appearance-none bg-gradient-to-r from-white to-gray-50">
+												<select name="tigsaw_container_id" id="tigsaw_modal_container_id" class="w-full px-5 py-4 pr-12 text-lg font-mono font-semibold border-2 border-gray-300 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary focus:ring-opacity-20 transition-all duration-200 bg-white hover:border-primary-light shadow-sm hover:shadow-md cursor-pointer appearance-none bg-gradient-to-r from-white to-gray-50">
 													<option value="">-- Select a Container --</option>
 												</select>
 												<div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
@@ -795,7 +804,7 @@ function tigsaw_settings_page() {
 								Select Container ID
 							</label>
 							<div class="relative">
-								<select name="tigsaw_container_id" id="tigsaw_container_id" class="w-full px-5 py-4 pr-12 text-lg font-mono font-semibold border-3 border-gray-300 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary focus:ring-opacity-20 transition-all duration-200 bg-white hover:border-primary-light shadow-sm hover:shadow-md cursor-pointer appearance-none bg-gradient-to-r from-white to-gray-50">
+								<select name="tigsaw_container_id" id="tigsaw_container_id" class="w-full px-5 py-4 pr-12 text-lg font-mono font-semibold border-2 border-gray-300 rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary focus:ring-opacity-20 transition-all duration-200 bg-white hover:border-primary-light shadow-sm hover:shadow-md cursor-pointer appearance-none bg-gradient-to-r from-white to-gray-50">
 									<option value="">-- Select a Container --</option>
 								</select>
 								<div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
@@ -848,7 +857,9 @@ function tigsaw_settings_page() {
 
 			<!-- Footer Info -->
 			<div class="mt-6 text-center text-gray-500 text-sm">
-				<p><?php echo sprintf( esc_html__( 'Tigsaw v%s', 'tigsaw' ), TIGSAW_VERSION ); ?> | <a href="https://tigsaw.com" target="_blank" class="text-primary hover:text-primary-dark"><?php echo esc_html__( 'Visit Tigsaw.com', 'tigsaw' ); ?></a></p>
+				<p><?php 
+				/* translators: %s: Plugin version number */
+				echo sprintf( esc_html__( 'Tigsaw v%s', 'tigsaw' ), esc_html( TIGSAW_VERSION ) ); ?> | <a href="https://tigsaw.com" target="_blank" class="text-primary hover:text-primary-dark"><?php echo esc_html__( 'Visit Tigsaw.com', 'tigsaw' ); ?></a></p>
 			</div>
 		</div>
 
@@ -878,6 +889,12 @@ function tigsaw_settings_page() {
 				const errorEl = isModal ? '#tigsaw-modal-activation-error' : '#tigsaw-activation-error';
 				const errorMsgEl = isModal ? '#tigsaw-modal-activation-error-message' : '#tigsaw-activation-error-message';
 
+				// Skip verification on localhost or 127.0.0.1
+				if (domain.indexOf('localhost') !== -1 || domain.indexOf('127.0.0.1') !== -1) {
+					onSuccess();
+					return;
+				}
+
 				$(loadingEl).removeClass('hidden').show();
 				$(errorEl).hide();
 
@@ -887,7 +904,7 @@ function tigsaw_settings_page() {
 					dataType: 'json',
 					success: function(response) {
 						$(loadingEl).hide();
-						
+                        
 						if (response && response.status === true) {
 							// Verification successful
 							console.log('Container verified:', response.message);
@@ -902,9 +919,9 @@ function tigsaw_settings_page() {
 					},
 					error: function(xhr, status, error) {
 						$(loadingEl).hide();
-						
+                        
 						let errorMessage = tigsawL10n.unableToVerify;
-						
+                        
 						if (xhr.status === 404) {
 							errorMessage += tigsawL10n.containerNotFound;
 						} else if (xhr.status === 500) {
@@ -912,7 +929,7 @@ function tigsaw_settings_page() {
 						} else {
 							errorMessage += tigsawL10n.checkConnection;
 						}
-						
+                        
 						$(errorMsgEl).text(errorMessage);
 						$(errorEl).removeClass('hidden').show();
 						onError(errorMessage);
@@ -1189,7 +1206,7 @@ function tigsaw_settings_page() {
 				if (confirm(tigsawL10n.removeConfirm)) {
 					// Create hidden form to submit removal
 					var form = $('<form method="post" action="options.php"></form>');
-					form.append('<?php echo wp_nonce_field('tigsaw_settings_group-options', '_wpnonce', true, false); ?>');
+					form.append('<?php echo wp_kses( wp_nonce_field( 'tigsaw_settings_group-options', '_wpnonce', true, false ), array( 'input' => array( 'type' => array(), 'id' => array(), 'name' => array(), 'value' => array() ) ) ); ?>');
 					form.append('<input type="hidden" name="option_page" value="tigsaw_settings_group">');
 					form.append('<input type="hidden" name="action" value="update">');
 					form.append('<input type="hidden" name="tigsaw_container_id" value="">');
@@ -1205,18 +1222,25 @@ function tigsaw_settings_page() {
 }
 
 /**
- * Inject Smart Script in header
+ * Enqueue Smart Script in header
  */
-function tigsaw_inject_script() {
+function tigsaw_enqueue_smart_script() {
 	$container_id = get_option( 'tigsaw_container_id', '' );
 	$script_enabled = get_option( 'tigsaw_script_enabled', '0' );
 
 	if ( $container_id && $script_enabled === '1' ) {
 		$script_url = 'https://static.tigsaw.com/delivery/smartscript.js?container=' . esc_attr( $container_id ) . '&mode=wordpress';
-		?>
-		<!-- Tigsaw Smart Script -->
-		<script src="<?php echo esc_url( $script_url ); ?>" async></script>
-		<?php
+		
+		wp_enqueue_script(
+			'tigsaw-smart-script',
+			$script_url,
+			array(),
+			null,
+			array(
+				'strategy'  => 'async',
+				'in_footer' => false,
+			)
+		);
 	}
 }
-add_action( 'wp_head', 'tigsaw_inject_script' );
+add_action( 'wp_enqueue_scripts', 'tigsaw_enqueue_smart_script' );

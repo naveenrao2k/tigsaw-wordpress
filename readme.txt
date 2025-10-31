@@ -1,14 +1,14 @@
-=== Tigsaw - AI + Visual Editor ===
+=== Tigsaw ===
 Contributors: naveenrao
 Tags: tigsaw, smart script, AI, visual editor, integration
 Requires at least: 5.0
-Tested up to: 6.8.3
+Tested up to: 6.8
 Requires PHP: 7.4
 Stable tag: 1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Seamlessly integrate Tigsaw's AI-powered visual editor and smart script into your WordPress site with automatic domain verification and container management.
+Integrate Tigsaw's AI-powered visual editor and smart script into your WordPress site with automatic domain verification.
 
 == Description ==
 
@@ -37,18 +37,12 @@ Seamlessly integrate Tigsaw's AI-powered visual editor and smart script into you
 
 This plugin relies on external services to function:
 
-**Tigsaw ** (https://tigsaw.com)
+**Tigsaw API** (https://tigsaw.com/api/integration/)
 - Used to fetch available container IDs for your domain
 - Used to verify container activation status
 - Data sent: Your WordPress site domain URL, selected container ID
 - Privacy Policy: https://tigsaw.com/privacy
 - Terms of Service: https://tigsaw.com/tos
-
-**Tailwind CSS CDN** (https://cdn.tailwindcss.com)
-- Used only in the admin settings page for styling
-- No data is sent to this service
-- Loaded only for plugin administrators
-- Privacy: No tracking or data collection
 
 **Tigsaw Smart Script** (https://static.tigsaw.com/delivery/smartscript.js)
 - Loaded on the front-end when a container is activated

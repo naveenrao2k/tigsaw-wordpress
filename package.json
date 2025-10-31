@@ -1,0 +1,16 @@
+{
+  "name": "tigsaw-wordpress-plugin",
+  "version": "1.0.0",
+  "description": "Tigsaw WordPress Plugin - Tailwind CSS Build",
+  "scripts": {
+    "build": "tailwindcss -i ./assets/css/src/tailwind.css -o ./assets/css/tailwind.min.css --minify",
+    "watch": "tailwindcss -i ./assets/css/src/tailwind.css -o ./assets/css/tailwind.min.css --watch",
+    "dev": "tailwindcss -i ./assets/css/src/tailwind.css -o ./assets/css/tailwind.css"
+  },
+  "keywords": ["wordpress", "plugin", "tailwind"],
+  "author": "NaveenRao",
+  "license": "GPL-2.0-or-later",
+  "devDependencies": {
+    "tailwindcss": "^3.4.0"
+  }
+}
