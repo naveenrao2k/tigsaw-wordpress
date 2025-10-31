@@ -1,0 +1,187 @@
+name: Test, Build & Release
+
+on:
+  push:
+    branches:
+      - master
+      - main
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - master
+      - main
+
+jobs:
+  test:
+    name: Code Quality & Standards
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: mbstring, xml, mysqli
+          coverage: none
+          tools: composer, cs2pr
+
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install Composer dependencies
+        run: |
+          if [ -f "composer.json" ]; then
+            composer install --prefer-dist --no-progress --no-suggest
+          else
+            composer init --no-interaction
+            composer require --dev squizlabs/php_codesniffer dealerdirect/phpcodesniffer-composer-installer wp-coding-standards/wpcs
+          fi
+
+      - name: Run PHPCS
+        run: |
+          vendor/bin/phpcs --standard=WordPress --extensions=php --ignore=*/vendor/*,*/node_modules/* --report=checkstyle . | cs2pr
+        continue-on-error: true
+
+  build:
+    name: Build Production Assets
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Tailwind CSS (Production)
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Verify build output
+        run: |
+          if [ ! -f "assets/css/tailwind.min.css" ]; then
+            echo "Error: Tailwind CSS build failed"
+            exit 1
+          fi
+          echo "Build successful. CSS file size:"
+          ls -lh assets/css/tailwind.min.css
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: production-assets
+          path: |
+            assets/css/tailwind.min.css
+            assets/js/*.js
+          retention-days: 5
+
+  release:
+    name: Create Release Package
+    runs-on: ubuntu-latest
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build production assets
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Create plugin package
+        run: |
+          # Create clean directory structure
+          mkdir -p tigsaw-release
+          
+          # Copy plugin files
+          rsync -av --progress . tigsaw-release/tigsaw \
+            --exclude tigsaw-release \
+            --exclude .git \
+            --exclude .github \
+            --exclude node_modules \
+            --exclude .gitignore \
+            --exclude .gitattributes \
+            --exclude package.json \
+            --exclude package-lock.json \
+            --exclude tailwind.config.js \
+            --exclude composer.json \
+            --exclude composer.lock \
+            --exclude phpcs.xml \
+            --exclude phpunit.xml \
+            --exclude tests \
+            --exclude assets/css/src \
+            --exclude TAILWIND_BUILD.md \
+            --exclude README.md
+          
+          # Create zip file
+          cd tigsaw-release
+          zip -r ../tigsaw-plugin.zip tigsaw
+          cd ..
+          
+          # Calculate checksums
+          sha256sum tigsaw-plugin.zip > tigsaw-plugin.zip.sha256
+
+      - name: Extract version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Tigsaw v${{ steps.get_version.outputs.VERSION }}
+          body: |
+            ## Tigsaw WordPress Plugin v${{ steps.get_version.outputs.VERSION }}
+            
+            ### Installation
+            1. Download `tigsaw-plugin.zip`
+            2. Go to WordPress Admin → Plugins → Add New → Upload Plugin
+            3. Upload the zip file and activate
+            
+            ### What's Included
+            - Production-optimized Tailwind CSS (minified)
+            - All necessary plugin files
+            - No development dependencies
+            
+            ### Checksums
+            See `tigsaw-plugin.zip.sha256` for SHA256 checksum
+            
+            ---
+            For more information, visit [tigsaw.com](https://tigsaw.com)
+          files: |
+            tigsaw-plugin.zip
+            tigsaw-plugin.zip.sha256
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

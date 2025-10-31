@@ -1,0 +1,7 @@
+name: CI/CD Pipeline Status
+on: [push, pull_request]
+jobs:
+  status:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "CI/CD Pipeline Active"

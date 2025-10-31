@@ -1,0 +1,32 @@
+# Tigsaw WordPress Plugin - Build & Release
+
+## Development Dependencies
+vendor/
+node_modules/
+composer.lock
+package-lock.json
+
+## Source files (not needed in production)
+assets/css/src/
+tailwind.config.js
+TAILWIND_BUILD.md
+
+## GitHub & Git
+.github/
+.git/
+.gitignore
+.gitattributes
+
+## Documentation (development only)
+README.md
+
+## Testing
+tests/
+phpunit.xml
+phpcs.xml
+
+## Build artifacts
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
