@@ -5,6 +5,8 @@ vendor/
 node_modules/
 composer.lock
 package-lock.json
+composer.json
+package.json
 
 ## Source files (not needed in production)
 assets/css/src/
@@ -17,16 +19,24 @@ TAILWIND_BUILD.md
 .gitignore
 .gitattributes
 
+## WordPress.org Assets (not in plugin zip)
+.wordpress-org/
+
 ## Documentation (development only)
 README.md
+DEPLOYMENT.md
 
 ## Testing
 tests/
 phpunit.xml
 phpcs.xml
+.phpcs.xml.dist
 
-## Build artifacts
+## Build artifacts and misc
 *.log
 npm-debug.log*
 .DS_Store
 Thumbs.db
+.distignore
+*.zip
+*.sha256
