@@ -194,7 +194,7 @@ function tigsaw_plugin_row_meta( $links, $file ) {
 		$row_meta = array(
 			'docs' => sprintf(
 				'<a href="%s" target="_blank" style="color: #ff6600;">%s</a>',
-				'https://tigsaw.com/docs',
+				'https://docs.tigsaw.com',
 				esc_html__( 'Documentation', 'tigsaw' )
 			),
 			'support' => sprintf(
