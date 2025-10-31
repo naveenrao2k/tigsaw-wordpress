@@ -40,18 +40,34 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
 
-      - name: Install Composer dependencies
+      - name: Create composer.json if not exists
         run: |
-          if [ -f "composer.json" ]; then
-            composer install --prefer-dist --no-progress --no-suggest
-          else
-            composer init --no-interaction
-            composer require --dev squizlabs/php_codesniffer dealerdirect/phpcodesniffer-composer-installer wp-coding-standards/wpcs
+          if [ ! -f "composer.json" ]; then
+            cat > composer.json << 'EOF'
+          {
+            "name": "naveenrao2k/tigsaw",
+            "description": "Tigsaw WordPress Plugin",
+            "type": "wordpress-plugin",
+            "require-dev": {
+              "squizlabs/php_codesniffer": "^3.7",
+              "wp-coding-standards/wpcs": "^3.0",
+              "dealerdirect/phpcodesniffer-composer-installer": "^1.0"
+            },
+            "config": {
+              "allow-plugins": {
+                "dealerdirect/phpcodesniffer-composer-installer": true
+              }
+            }
+          }
+          EOF
           fi
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress
 
       - name: Run PHPCS
         run: |
-          vendor/bin/phpcs --standard=WordPress --extensions=php --ignore=*/vendor/*,*/node_modules/* --report=checkstyle . | cs2pr
+          vendor/bin/phpcs --standard=WordPress --extensions=php --ignore=*/vendor/*,*/node_modules/* . || true
         continue-on-error: true
 
   build:

@@ -1,0 +1,25 @@
+{
+  "name": "naveenrao2k/tigsaw-wordpress-plugin",
+  "description": "Tigsaw WordPress Plugin - Integration with Tigsaw platform",
+  "type": "wordpress-plugin",
+  "license": "GPL-2.0-or-later",
+  "authors": [
+    {
+      "name": "NaveenRao",
+      "homepage": "https://tigsaw.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.4"
+  },
+  "require-dev": {
+    "squizlabs/php_codesniffer": "^3.7",
+    "wp-coding-standards/wpcs": "^3.0",
+    "dealerdirect/phpcodesniffer-composer-installer": "^1.0"
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  }
+}
