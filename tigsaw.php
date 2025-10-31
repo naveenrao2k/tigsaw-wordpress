@@ -1235,7 +1235,7 @@ function tigsaw_enqueue_smart_script() {
 			'tigsaw-smart-script',
 			$script_url,
 			array(),
-			null,
+			TIGSAW_VERSION,
 			array(
 				'strategy'  => 'async',
 				'in_footer' => false,
