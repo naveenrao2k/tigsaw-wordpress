@@ -4,7 +4,7 @@
  * Plugin URI:      https://tigsaw.com
  * Description:     Integration plugin with Tigsaw platform to verify domain connectivity and add smart script to your WordPress site header.
  * Author:          NaveenRao
- * Author URI:      https://tigsaw.com
+ * Author URI:      https://naveenrao.com
  * Text Domain:     tigsaw
  * Domain Path:     /languages
  * Version:         1.0
