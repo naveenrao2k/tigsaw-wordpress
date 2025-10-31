@@ -2,8 +2,8 @@
 node_modules/
 
 # Generated CSS
-# assets/css/tailwind.min.css
-# assets/css/tailwind.css
+assets/css/tailwind.min.css
+#assets/css/tailwind.css
 
 # NPM
 

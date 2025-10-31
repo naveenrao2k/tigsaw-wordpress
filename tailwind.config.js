@@ -2,9 +2,9 @@
 module.exports = {
   content: [
     "./tigsaw.php",
-    "./assets/**/*.{php,js,jsx,ts,tsx,html}",
-    "./includes/**/*.{php,js,jsx,ts,tsx,html}",
-    "./**/*.{php,js,jsx,ts,tsx,html}"
+    "./uninstall.php",
+    "./assets/**/*.{php,js,jsx,html}",
+    "./includes/**/*.{php,js,jsx,html}"
   ],
   safelist: [
     // Add common patterns and dynamic classes here
