@@ -6,7 +6,7 @@ node_modules/
 # assets/css/tailwind.css
 
 # NPM
-package-lock.json
+
 
 # IDE
 .vscode/
