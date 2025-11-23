@@ -1,0 +1,76 @@
+/**
+ * Tigsaw Admin Styles
+ * Admin menu icon styling and customizations
+ */
+
+/* Tigsaw menu icon styling - Default/Unselected state (20px) */
+#adminmenu li#toplevel_page_tigsaw-settings .wp-menu-image img {
+	width: 20px !important;
+	height: 20px !important;
+	min-width: 20px !important;
+	min-height: 20px !important;
+	max-width: 20px !important;
+	max-height: 20px !important;
+	padding: 6px 0 !important;
+	margin: 0 !important;
+	opacity: 0.6;
+	transition: all 0.2s ease;
+}
+
+/* Hover state - keep 20px */
+#adminmenu li#toplevel_page_tigsaw-settings:hover .wp-menu-image img {
+	opacity: 1 !important;
+}
+
+/* Selected/Active state - Increase to 30px height */
+#adminmenu li#toplevel_page_tigsaw-settings.current .wp-menu-image img,
+#adminmenu li#toplevel_page_tigsaw-settings.wp-has-current-submenu .wp-menu-image img,
+#adminmenu li#toplevel_page_tigsaw-settings.wp-menu-open .wp-menu-image img {
+	width: 30px !important;
+	height: 30px !important;
+	min-width: 30px !important;
+	min-height: 30px !important;
+	max-width: 30px !important;
+	max-height: 30px !important;
+	opacity: 1 !important;
+	padding: 3px 0 !important;
+}
+
+/* Container fixes - Default */
+#adminmenu li#toplevel_page_tigsaw-settings .wp-menu-image {
+	padding-top: 0 !important;
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	width: 36px !important;
+	height: 34px !important;
+}
+
+#adminmenu li#toplevel_page_tigsaw-settings .wp-menu-image:before {
+	display: none !important;
+}
+
+/* Override any WordPress auto-sizing */
+#adminmenu li#toplevel_page_tigsaw-settings div.wp-menu-image {
+	background-size: 20px 20px !important;
+}
+
+#adminmenu li#toplevel_page_tigsaw-settings.current div.wp-menu-image,
+#adminmenu li#toplevel_page_tigsaw-settings.wp-has-current-submenu div.wp-menu-image {
+	background-size: 30px 30px !important;
+}
+
+/* Remove unwanted current/highlighted state when not on the page */
+#adminmenu #toplevel_page_tigsaw-settings.wp-not-current-submenu {
+	background: transparent !important;
+}
+
+#adminmenu #toplevel_page_tigsaw-settings.wp-not-current-submenu > a {
+	background: transparent !important;
+	color: #f0f0f1 !important;
+}
+
+#adminmenu #toplevel_page_tigsaw-settings.wp-not-current-submenu:hover > a {
+	background: rgba(255, 255, 255, 0.05) !important;
+	color: #72aee6 !important;
+}

@@ -91,86 +91,65 @@ function tigsaw_add_admin_menu() {
 add_action( 'admin_menu', 'tigsaw_add_admin_menu' );
 
 /**
- * Enqueue admin styles for menu icon
+ * Enqueue admin styles and scripts
  */
-function tigsaw_admin_menu_styles() {
-	?>
-	<style>
-		/* Tigsaw menu icon styling - Default/Unselected state (20px) */
-		#adminmenu li#toplevel_page_tigsaw-settings .wp-menu-image img {
-			width: 20px !important;
-			height: 20px !important;
-			min-width: 20px !important;
-			min-height: 20px !important;
-			max-width: 20px !important;
-			max-height: 20px !important;
-			padding: 6px 0 !important;
-			margin: 0 !important;
-			opacity: 0.6;
-			transition: all 0.2s ease;
-		}
-		
-		/* Hover state - keep 20px */
-		#adminmenu li#toplevel_page_tigsaw-settings:hover .wp-menu-image img {
-			opacity: 1 !important;
-		}
-		
-		/* Selected/Active state - Increase to 30px height */
-		#adminmenu li#toplevel_page_tigsaw-settings.current .wp-menu-image img,
-		#adminmenu li#toplevel_page_tigsaw-settings.wp-has-current-submenu .wp-menu-image img,
-		#adminmenu li#toplevel_page_tigsaw-settings.wp-menu-open .wp-menu-image img {
-			width: 30px !important;
-			height: 30px !important;
-			min-width: 30px !important;
-			min-height: 30px !important;
-			max-width: 30px !important;
-			max-height: 30px !important;
-			opacity: 1 !important;
-			padding: 3px 0 !important;
-		}
-		
-		/* Container fixes - Default */
-		#adminmenu li#toplevel_page_tigsaw-settings .wp-menu-image {
-			padding-top: 0 !important;
-			display: flex !important;
-			align-items: center !important;
-			justify-content: center !important;
-			width: 36px !important;
-			height: 34px !important;
-		}
-		
-		#adminmenu li#toplevel_page_tigsaw-settings .wp-menu-image:before {
-			display: none !important;
-		}
-		
-		/* Override any WordPress auto-sizing */
-		#adminmenu li#toplevel_page_tigsaw-settings div.wp-menu-image {
-			background-size: 20px 20px !important;
-		}
-		
-		#adminmenu li#toplevel_page_tigsaw-settings.current div.wp-menu-image,
-		#adminmenu li#toplevel_page_tigsaw-settings.wp-has-current-submenu div.wp-menu-image {
-			background-size: 30px 30px !important;
-		}
-		
-		/* Remove unwanted current/highlighted state when not on the page */
-		#adminmenu #toplevel_page_tigsaw-settings.wp-not-current-submenu {
-			background: transparent !important;
-		}
-		
-		#adminmenu #toplevel_page_tigsaw-settings.wp-not-current-submenu > a {
-			background: transparent !important;
-			color: #f0f0f1 !important;
-		}
-		
-		#adminmenu #toplevel_page_tigsaw-settings.wp-not-current-submenu:hover > a {
-			background: rgba(255, 255, 255, 0.05) !important;
-			color: #72aee6 !important;
-		}
-	</style>
-	<?php
+function tigsaw_admin_enqueue_scripts( $hook ) {
+	// Only load on our plugin's admin page
+	if ( 'toplevel_page_tigsaw-settings' !== $hook ) {
+		return;
+	}
+
+	// Enqueue admin CSS
+	wp_enqueue_style(
+		'tigsaw-admin',
+		plugins_url( 'assets/css/admin.css', __FILE__ ),
+		array(),
+		TIGSAW_VERSION,
+		'all'
+	);
+
+	// Enqueue admin JavaScript
+	wp_enqueue_script(
+		'tigsaw-admin',
+		plugins_url( 'assets/js/admin.js', __FILE__ ),
+		array( 'jquery' ),
+		TIGSAW_VERSION,
+		true
+	);
+
+	// Localize script with translations and data
+	$domain       = isset( $_SERVER['HTTP_HOST'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
+	$container_id = get_option( 'tigsaw_container_id', '' );
+
+	wp_localize_script(
+		'tigsaw-admin',
+		'tigsawL10n',
+		array(
+			'selectContainer'       => __( 'Please select a container ID.', 'tigsaw' ),
+			'containerFormat'       => __( 'Container ID format looks unusual. Continue anyway?\n\nTypical format: CW172SE6 (6-12 alphanumeric characters)', 'tigsaw' ),
+			'enterValid'            => __( 'Please enter a valid container ID.', 'tigsaw' ),
+			'removeConfirm'         => __( 'Are you sure you want to remove the Tigsaw Smart Script? This will disconnect your site from the Tigsaw platform.', 'tigsaw' ),
+			'selectContainerOption' => __( '-- Select a Container --', 'tigsaw' ),
+			'manualLabel'           => __( ' (Manual)', 'tigsaw' ),
+			'verificationFailed'    => __( 'Container verification failed', 'tigsaw' ),
+			'unableToVerify'        => __( 'Unable to verify container with Tigsaw. ', 'tigsaw' ),
+			'containerNotFound'     => __( 'Container not found.', 'tigsaw' ),
+			'internalError'         => __( 'Internal server error. Please try again later.', 'tigsaw' ),
+			'checkConnection'       => __( 'Please check your connection and try again.', 'tigsaw' ),
+		)
+	);
+
+	wp_localize_script(
+		'tigsaw-admin',
+		'tigsawAdmin',
+		array(
+			'domain'           => $domain,
+			'savedContainerId' => $container_id,
+			'nonce'            => wp_nonce_field( 'tigsaw_settings_group-options', '_wpnonce', true, false ),
+		)
+	);
 }
-add_action( 'admin_head', 'tigsaw_admin_menu_styles' );
+add_action( 'admin_enqueue_scripts', 'tigsaw_admin_enqueue_scripts' );
 
 /**
  * Add settings link on plugins page
@@ -862,361 +841,6 @@ function tigsaw_settings_page() {
 				echo sprintf( esc_html__( 'Tigsaw v%s', 'tigsaw' ), esc_html( TIGSAW_VERSION ) ); ?> | <a href="https://tigsaw.com" target="_blank" class="text-primary hover:text-primary-dark"><?php echo esc_html__( 'Visit Tigsaw.com', 'tigsaw' ); ?></a></p>
 			</div>
 		</div>
-
-		<script>
-		var tigsawL10n = {
-			selectContainer: <?php echo wp_json_encode( __( 'Please select a container ID.', 'tigsaw' ) ); ?>,
-			containerFormat: <?php echo wp_json_encode( __( 'Container ID format looks unusual. Continue anyway?\n\nTypical format: CW172SE6 (6-12 alphanumeric characters)', 'tigsaw' ) ); ?>,
-			enterValid: <?php echo wp_json_encode( __( 'Please enter a valid container ID.', 'tigsaw' ) ); ?>,
-			removeConfirm: <?php echo wp_json_encode( __( 'Are you sure you want to remove the Tigsaw Smart Script? This will disconnect your site from the Tigsaw platform.', 'tigsaw' ) ); ?>,
-			selectContainerOption: <?php echo wp_json_encode( __( '-- Select a Container --', 'tigsaw' ) ); ?>,
-			manualLabel: <?php echo wp_json_encode( __( ' (Manual)', 'tigsaw' ) ); ?>,
-			verificationFailed: <?php echo wp_json_encode( __( 'Container verification failed', 'tigsaw' ) ); ?>,
-			unableToVerify: <?php echo wp_json_encode( __( 'Unable to verify container with Tigsaw. ', 'tigsaw' ) ); ?>,
-			containerNotFound: <?php echo wp_json_encode( __( 'Container not found.', 'tigsaw' ) ); ?>,
-			internalError: <?php echo wp_json_encode( __( 'Internal server error. Please try again later.', 'tigsaw' ) ); ?>,
-			checkConnection: <?php echo wp_json_encode( __( 'Please check your connection and try again.', 'tigsaw' ) ); ?>
-		};
-		</script>
-		<script>
-		jQuery(document).ready(function($) {
-			const domain = '<?php echo esc_js( $domain ); ?>';
-			const savedContainerId = '<?php echo esc_js( $container_id ); ?>';
-
-			// Function to verify container with API
-			function verifyContainer(containerId, onSuccess, onError, isModal) {
-				const loadingEl = isModal ? '#tigsaw-modal-activation-loading' : '#tigsaw-activation-loading';
-				const errorEl = isModal ? '#tigsaw-modal-activation-error' : '#tigsaw-activation-error';
-				const errorMsgEl = isModal ? '#tigsaw-modal-activation-error-message' : '#tigsaw-activation-error-message';
-
-				// Skip verification on localhost or 127.0.0.1
-				if (domain.indexOf('localhost') !== -1 || domain.indexOf('127.0.0.1') !== -1) {
-					onSuccess();
-					return;
-				}
-
-				$(loadingEl).removeClass('hidden').show();
-				$(errorEl).hide();
-
-				$.ajax({
-					url: 'https://tigsaw.com/api/integration/verify?containerId=' + encodeURIComponent(containerId),
-					type: 'PUT',
-					dataType: 'json',
-					success: function(response) {
-						$(loadingEl).hide();
-                        
-						if (response && response.status === true) {
-							// Verification successful
-							console.log('Container verified:', response.message);
-							onSuccess();
-						} else {
-							// Container not found or verification failed
-							const errorMessage = response.message || tigsawL10n.verificationFailed;
-							$(errorMsgEl).text(errorMessage);
-							$(errorEl).removeClass('hidden').show();
-							onError(errorMessage);
-						}
-					},
-					error: function(xhr, status, error) {
-						$(loadingEl).hide();
-                        
-						let errorMessage = tigsawL10n.unableToVerify;
-                        
-						if (xhr.status === 404) {
-							errorMessage += tigsawL10n.containerNotFound;
-						} else if (xhr.status === 500) {
-							errorMessage += tigsawL10n.internalError;
-						} else {
-							errorMessage += tigsawL10n.checkConnection;
-						}
-                        
-						$(errorMsgEl).text(errorMessage);
-						$(errorEl).removeClass('hidden').show();
-						onError(errorMessage);
-						console.error('Verification API Error:', error, xhr);
-					}
-				});
-			}
-
-			// Intercept main form submission
-			$('#tigsaw-settings-form').on('submit', function(e) {
-				e.preventDefault();
-				
-				const selectedContainerId = $('#tigsaw_container_id').val();
-				
-				if (!selectedContainerId) {
-					alert(tigsawL10n.selectContainer);
-					return;
-				}
-
-				const $form = $(this);
-				const $submitBtn = $form.find('button[type="submit"]');
-				$submitBtn.prop('disabled', true);
-
-				// Verify container before submitting
-				verifyContainer(
-					selectedContainerId,
-					function() {
-						// Success - submit the form
-						$submitBtn.prop('disabled', false);
-						$form.off('submit').submit();
-					},
-					function(errorMessage) {
-						// Error - re-enable button
-						$submitBtn.prop('disabled', false);
-					},
-					false
-				);
-			});
-
-			// Intercept modal form submission
-			$('#tigsaw-modal-form').on('submit', function(e) {
-				e.preventDefault();
-				
-				const selectedContainerId = $('#tigsaw_modal_container_id').val();
-				
-				if (!selectedContainerId) {
-					alert(tigsawL10n.selectContainer);
-					return;
-				}
-
-				const $form = $(this);
-				const $submitBtn = $form.find('button[type="submit"]');
-				$submitBtn.prop('disabled', true);
-
-				// Verify container before submitting
-				verifyContainer(
-					selectedContainerId,
-					function() {
-						// Success - submit the form
-						$submitBtn.prop('disabled', false);
-						$form.off('submit').submit();
-					},
-					function(errorMessage) {
-						// Error - re-enable button
-						$submitBtn.prop('disabled', false);
-					},
-					true
-				);
-			});
-
-			// Fetch container ID
-			$('#tigsaw-fetch-btn').on('click', function() {
-				$('#tigsaw-fetch-section').hide();
-				$('#tigsaw-manual-section').hide();
-				$('#tigsaw-loading').removeClass('hidden').show();
-				$('#tigsaw-error').hide();
-				$('#tigsaw-settings-form').hide();
-
-				$.ajax({
-					url: 'https://tigsaw.com/api/integration/get-container?url=' + encodeURIComponent(domain),
-					type: 'GET',
-					dataType: 'json',
-					success: function(response) {
-						$('#tigsaw-loading').hide();
-
-						if (response && response.containerIds && response.containerIds.length > 0) {
-							// Populate dropdown
-							const $select = $('#tigsaw_container_id');
-							$select.empty();
-							$select.append('<option value="">' + tigsawL10n.selectContainerOption + '</option>');
-							
-							response.containerIds.forEach(function(containerId) {
-								const selected = (containerId === savedContainerId) ? 'selected' : '';
-								$select.append('<option value="' + containerId + '" ' + selected + '>' + containerId + '</option>');
-							});
-
-							$('#tigsaw-settings-form').removeClass('hidden').show();
-						} else {
-							$('#tigsaw-error').removeClass('hidden').show();
-							$('#tigsaw-fetch-section').show();
-						}
-					},
-					error: function(xhr, status, error) {
-						$('#tigsaw-loading').hide();
-						$('#tigsaw-error').removeClass('hidden').show();
-						$('#tigsaw-fetch-section').show();
-						console.error('API Error:', error);
-					}
-				});
-			});
-
-			// Manual container ID button (localhost only)
-			$('#tigsaw-manual-btn').on('click', function() {
-				$('#tigsaw-fetch-section').hide();
-				$('#tigsaw-loading').hide();
-				$('#tigsaw-error').hide();
-				$('#tigsaw-settings-form').hide();
-				$('#tigsaw-manual-section').removeClass('hidden').show();
-				$('#tigsaw-manual-input').focus();
-			});
-
-			// Manual container ID confirmation
-			$('#tigsaw-manual-confirm').on('click', function() {
-				const manualContainerId = $('#tigsaw-manual-input').val().trim();
-				
-				if (manualContainerId === '') {
-					alert(tigsawL10n.enterValid);
-					return;
-				}
-
-				// Validate format (alphanumeric, typically 8 characters)
-				if (!/^[A-Z0-9]{6,12}$/i.test(manualContainerId)) {
-					if (!confirm(tigsawL10n.containerFormat)) {
-						return;
-					}
-				}
-
-				// Populate dropdown with manual ID
-				const $select = $('#tigsaw_container_id');
-				$select.empty();
-				$select.append('<option value="">' + tigsawL10n.selectContainerOption + '</option>');
-				$select.append('<option value="' + manualContainerId + '" selected>' + manualContainerId + tigsawL10n.manualLabel + '</option>');
-
-				// Hide manual section and show form
-				$('#tigsaw-manual-section').hide();
-				$('#tigsaw-settings-form').removeClass('hidden').show();
-			});
-
-			// Allow Enter key in manual input
-			$('#tigsaw-manual-input').on('keypress', function(e) {
-				if (e.which === 13) {
-					e.preventDefault();
-					$('#tigsaw-manual-confirm').trigger('click');
-				}
-			});
-
-			// Auto-fetch if container ID exists but script not active
-			<?php if ( $container_id && $script_enabled !== '1' ) : ?>
-				$('#tigsaw-fetch-btn').trigger('click');
-			<?php endif; ?>
-
-			// Change container handler
-			$('#tigsaw-change-container').on('click', function() {
-				$('#tigsaw-change-modal').removeClass('hidden');
-			});
-
-			// Modal close handlers
-			$('#tigsaw-modal-close, #tigsaw-modal-cancel').on('click', function() {
-				$('#tigsaw-change-modal').addClass('hidden');
-				// Reset modal state
-				$('#tigsaw-modal-fetch-section').show();
-				$('#tigsaw-modal-manual-section').hide();
-				$('#tigsaw-modal-loading').hide();
-				$('#tigsaw-modal-error').hide();
-				$('#tigsaw-modal-form').hide();
-				$('#tigsaw-modal-manual-input').val('');
-			});
-
-			// Close modal on outside click
-			$('#tigsaw-change-modal').on('click', function(e) {
-				if ($(e.target).is('#tigsaw-change-modal')) {
-					$('#tigsaw-modal-close').trigger('click');
-				}
-			});
-
-			// Modal fetch button
-			$('#tigsaw-modal-fetch-btn').on('click', function() {
-				$('#tigsaw-modal-fetch-section').hide();
-				$('#tigsaw-modal-manual-section').hide();
-				$('#tigsaw-modal-loading').removeClass('hidden').show();
-				$('#tigsaw-modal-error').hide();
-				$('#tigsaw-modal-form').hide();
-
-				$.ajax({
-					url: 'https://tigsaw.com/api/integration/get-container?url=' + encodeURIComponent(domain),
-					type: 'GET',
-					dataType: 'json',
-					success: function(response) {
-						$('#tigsaw-modal-loading').hide();
-
-						if (response && response.containerIds && response.containerIds.length > 0) {
-							// Populate dropdown
-							const $select = $('#tigsaw_modal_container_id');
-							$select.empty();
-							$select.append('<option value="">' + tigsawL10n.selectContainerOption + '</option>');
-							
-							response.containerIds.forEach(function(containerId) {
-								// Don't pre-select the current one, let user choose
-								$select.append('<option value="' + containerId + '">' + containerId + '</option>');
-							});
-
-							$('#tigsaw-modal-form').removeClass('hidden').show();
-						} else {
-							$('#tigsaw-modal-error').removeClass('hidden').show();
-							$('#tigsaw-modal-fetch-section').show();
-						}
-					},
-					error: function(xhr, status, error) {
-						$('#tigsaw-modal-loading').hide();
-						$('#tigsaw-modal-error').removeClass('hidden').show();
-						$('#tigsaw-modal-fetch-section').show();
-						console.error('API Error:', error);
-					}
-				});
-			});
-
-			// Modal manual container ID button
-			$('#tigsaw-modal-manual-btn').on('click', function() {
-				$('#tigsaw-modal-fetch-section').hide();
-				$('#tigsaw-modal-loading').hide();
-				$('#tigsaw-modal-error').hide();
-				$('#tigsaw-modal-form').hide();
-				$('#tigsaw-modal-manual-section').removeClass('hidden').show();
-				$('#tigsaw-modal-manual-input').focus();
-			});
-
-			// Modal manual container ID confirmation
-			$('#tigsaw-modal-manual-confirm').on('click', function() {
-				const manualContainerId = $('#tigsaw-modal-manual-input').val().trim();
-				
-				if (manualContainerId === '') {
-					alert(tigsawL10n.enterValid);
-					return;
-				}
-
-				// Validate format (alphanumeric, typically 8 characters)
-				if (!/^[A-Z0-9]{6,12}$/i.test(manualContainerId)) {
-					if (!confirm(tigsawL10n.containerFormat)) {
-						return;
-					}
-				}
-
-				// Populate dropdown with manual ID
-				const $select = $('#tigsaw_modal_container_id');
-				$select.empty();
-				$select.append('<option value="">' + tigsawL10n.selectContainerOption + '</option>');
-				$select.append('<option value="' + manualContainerId + '" selected>' + manualContainerId + tigsawL10n.manualLabel + '</option>');
-
-				// Hide manual section and show form
-				$('#tigsaw-modal-manual-section').hide();
-				$('#tigsaw-modal-form').removeClass('hidden').show();
-			});
-
-			// Allow Enter key in modal manual input
-			$('#tigsaw-modal-manual-input').on('keypress', function(e) {
-				if (e.which === 13) {
-					e.preventDefault();
-					$('#tigsaw-modal-manual-confirm').trigger('click');
-				}
-			});
-
-			// Remove script handler
-			$('#tigsaw-remove-script').on('click', function() {
-				if (confirm(tigsawL10n.removeConfirm)) {
-					// Create hidden form to submit removal
-					var form = $('<form method="post" action="options.php"></form>');
-					form.append('<?php echo wp_kses( wp_nonce_field( 'tigsaw_settings_group-options', '_wpnonce', true, false ), array( 'input' => array( 'type' => array(), 'id' => array(), 'name' => array(), 'value' => array() ) ) ); ?>');
-					form.append('<input type="hidden" name="option_page" value="tigsaw_settings_group">');
-					form.append('<input type="hidden" name="action" value="update">');
-					form.append('<input type="hidden" name="tigsaw_container_id" value="">');
-					form.append('<input type="hidden" name="tigsaw_script_enabled" value="0">');
-					$('body').append(form);
-					form.submit();
-				}
-			});
-		});
-		</script>
 	</div>
 	<?php
 }
