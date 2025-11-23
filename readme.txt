@@ -4,7 +4,7 @@ Tags: tigsaw, smart script, AI, visual editor, integration
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.0
+Stable tag: 1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -62,20 +62,15 @@ The plugin automatically clears cache from these popular plugins:
 * Autoptimize
 * Comet Cache
 * Cache Enabler
-* Hummingbird
 * SG Optimizer
-* Breeze (Cloudways)
 * WP-Optimize
 * Swift Performance
 * Perfmatters
 * NitroPack
-* Cloudflare
 * Pantheon Advanced Page Cache
-* Varnish Cache
 * WP Engine Cache
 * Kinsta Cache
 * Pagely Cache
-* Nginx Helper
 * Redis Object Cache
 * And more!
 
@@ -178,6 +173,15 @@ Yes, the plugin is fully internationalized and ready for translation into any la
 
 == Changelog ==
 
+= 1.1 =
+* Enhanced: Improved WordPress coding standards compliance
+* Enhanced: Implemented proper wp_enqueue_script() for JavaScript files
+* Enhanced: Implemented proper wp_enqueue_style() for CSS files
+* Enhanced: Removed inline CSS and JavaScript for better performance
+* Enhanced: Added dedicated admin.css and admin.js files
+* Enhanced: Better browser caching with versioned assets
+* Fixed: WordPress.org plugin review compliance issues
+
 = 1.0 =
 * Initial release
 * Automatic domain detection
@@ -190,6 +194,9 @@ Yes, the plugin is fully internationalized and ready for translation into any la
 * Complete uninstall cleanup
 
 == Upgrade Notice ==
+
+= 1.1 =
+Recommended update: Improved WordPress coding standards compliance with proper asset enqueuing, better performance, and enhanced browser caching.
 
 = 1.0 =
 Initial release of Tigsaw integration plugin. Install to connect your WordPress site with Tigsaw's AI-powered visual editor.

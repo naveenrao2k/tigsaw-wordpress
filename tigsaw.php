@@ -4,10 +4,10 @@
  * Plugin URI:      https://tigsaw.com
  * Description:     Integration plugin with Tigsaw platform to verify domain connectivity and add smart script to your WordPress site header.
  * Author:          NaveenRao
- * Author URI:      https://naveenrao.com
+ * Author URI:      https://github.com/naveenrao2k
  * Text Domain:     tigsaw
  * Domain Path:     /languages
- * Version:         1.0
+ * Version:         1.1
  * Requires at least: 5.0
  * Requires PHP:    7.4
  * Tested up to:    6.8
@@ -37,7 +37,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define plugin constants
-define( 'TIGSAW_VERSION', '1.0' );
+define( 'TIGSAW_VERSION', '1.1' );
 define( 'TIGSAW_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'TIGSAW_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
@@ -293,19 +293,9 @@ function tigsaw_clear_all_caches() {
 		Cache_Enabler::clear_complete_cache();
 	}
 	
-	// Hummingbird Cache
-	if ( class_exists( 'Hummingbird\WP_Hummingbird' ) ) {
-		do_action( 'wphb_clear_page_cache' );
-	}
-	
 	// SG Optimizer
 	if ( function_exists( 'sg_cachepress_purge_cache' ) ) {
 		sg_cachepress_purge_cache();
-	}
-	
-	// Breeze Cache (Cloudways)
-	if ( class_exists( 'Breeze_PurgeCache' ) ) {
-		do_action( 'breeze_clear_all_cache' );
 	}
 	
 	// WP-Optimize
@@ -331,19 +321,9 @@ function tigsaw_clear_all_caches() {
 		nitropack_sdk_purge();
 	}
 	
-	// Cloudflare (official plugin)
-	if ( class_exists( 'CF\WordPress\Hooks' ) ) {
-		do_action( 'cloudflare_purge_everything' );
-	}
-	
 	// Pantheon Advanced Page Cache
 	if ( function_exists( 'pantheon_wp_clear_edge_all' ) ) {
 		pantheon_wp_clear_edge_all();
-	}
-	
-	// Varnish Cache
-	if ( function_exists( 'varnish_http_purge' ) ) {
-		do_action( 'vhp_purge_all' );
 	}
 	
 	// WP Engine
@@ -369,11 +349,6 @@ function tigsaw_clear_all_caches() {
 	if ( class_exists( 'PagelyCachePurge' ) ) {
 		$purger = new PagelyCachePurge();
 		$purger->purgeAll();
-	}
-	
-	// Nginx Helper
-	if ( class_exists( 'Nginx_Helper' ) ) {
-		do_action( 'rt_nginx_helper_purge_all' );
 	}
 	
 	// Redis Object Cache

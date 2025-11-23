@@ -18,14 +18,14 @@ delete_option( 'tigsaw_activation_redirect' );
 // For multisite
 if ( is_multisite() ) {
 	// Get all sites using WordPress function
-	$sites = get_sites(
+	$tigsaw_sites = get_sites(
 		array(
 			'number' => 9999,
 		)
 	);
 
-	foreach ( $sites as $site ) {
-		switch_to_blog( $site->blog_id );
+	foreach ( $tigsaw_sites as $tigsaw_site ) {
+		switch_to_blog( $tigsaw_site->blog_id );
 		delete_option( 'tigsaw_container_id' );
 		delete_option( 'tigsaw_script_enabled' );
 		delete_option( 'tigsaw_activation_redirect' );
