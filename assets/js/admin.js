@@ -131,19 +131,19 @@
 			$('#tigsaw-modal-error').hide();
 			
 			$.ajax({
-				url: 'https://tigsaw.com/api/integration/containers?domain=' + encodeURIComponent(domain),
+				url: 'https://tigsaw.com/api/integration/get-container?url=' + encodeURIComponent(domain),
 				type: 'GET',
 				dataType: 'json',
 				success: function(response) {
 					$('#tigsaw-modal-loading').hide();
 					
-					if (response && response.containers && Array.isArray(response.containers) && response.containers.length > 0) {
+					if (response && response.containerIds && Array.isArray(response.containerIds) && response.containerIds.length > 0) {
 						const $select = $('#tigsaw_modal_container_id');
 						$select.empty();
 						$select.append('<option value="">' + tigsawL10n.selectContainerOption + '</option>');
 						
-						response.containers.forEach(function(container) {
-							$select.append('<option value="' + container.containerId + '">' + container.containerId + '</option>');
+						response.containerIds.forEach(function(containerId) {
+							$select.append('<option value="' + containerId + '">' + containerId + '</option>');
 						});
 						
 						$('#tigsaw-modal-fetch-section').hide();
@@ -159,6 +159,89 @@
 					console.error('API Error:', error);
 				}
 			});
+		});
+
+		// Main fetch containers button
+		$('#tigsaw-fetch-btn').on('click', function() {
+			$('#tigsaw-loading').removeClass('hidden').show();
+			$('#tigsaw-error').hide();
+			$('#tigsaw-fetch-section').hide();
+			$('#tigsaw-manual-section').hide();
+			
+			$.ajax({
+				url: 'https://tigsaw.com/api/integration/get-container?url=' + encodeURIComponent(domain),
+				type: 'GET',
+				dataType: 'json',
+				success: function(response) {
+					$('#tigsaw-loading').hide();
+					
+					if (response && response.containerIds && Array.isArray(response.containerIds) && response.containerIds.length > 0) {
+						const $select = $('#tigsaw_container_id');
+						$select.empty();
+						$select.append('<option value="">' + tigsawL10n.selectContainerOption + '</option>');
+						
+						response.containerIds.forEach(function(containerId) {
+							$select.append('<option value="' + containerId + '">' + containerId + '</option>');
+						});
+						
+						$('#tigsaw-settings-form').removeClass('hidden').show();
+					} else {
+						$('#tigsaw-error').removeClass('hidden').show();
+						$('#tigsaw-fetch-section').show();
+					}
+				},
+				error: function(xhr, status, error) {
+					$('#tigsaw-loading').hide();
+					$('#tigsaw-error').removeClass('hidden').show();
+					$('#tigsaw-fetch-section').show();
+					console.error('API Error:', error);
+				}
+			});
+		});
+
+		// Main manual container ID button
+		$('#tigsaw-manual-btn').on('click', function() {
+			$('#tigsaw-fetch-section').hide();
+			$('#tigsaw-loading').hide();
+			$('#tigsaw-error').hide();
+			$('#tigsaw-settings-form').hide();
+			$('#tigsaw-manual-section').removeClass('hidden').show();
+			$('#tigsaw-manual-input').focus();
+		});
+
+		// Main manual container ID confirmation
+		$('#tigsaw-manual-confirm').on('click', function() {
+			const manualContainerId = $('#tigsaw-manual-input').val().trim();
+			
+			if (manualContainerId === '') {
+				alert(tigsawL10n.enterValid);
+				return;
+			}
+
+			// Validate format (alphanumeric, typically 8 characters)
+			if (!/^[A-Z0-9]{6,12}$/i.test(manualContainerId)) {
+				if (!confirm(tigsawL10n.containerFormat)) {
+					return;
+				}
+			}
+
+			// Populate dropdown with manual ID
+			const $select = $('#tigsaw_container_id');
+			$select.empty();
+			$select.append('<option value="">' + tigsawL10n.selectContainerOption + '</option>');
+			$select.append('<option value="' + manualContainerId + '" selected>' + manualContainerId + tigsawL10n.manualLabel + '</option>');
+
+			// Hide manual section and show form
+			$('#tigsaw-manual-section').hide();
+			$('#tigsaw-settings-form').removeClass('hidden').show();
+		});
+
+		// Allow Enter key in main manual input
+		$('#tigsaw-manual-input').on('keypress', function(e) {
+			if (e.which === 13) {
+				e.preventDefault();
+				$('#tigsaw-manual-confirm').trigger('click');
+			}
 		});
 
 		// Modal manual container ID button
@@ -218,6 +301,39 @@
 				form.append('<input type="hidden" name="tigsaw_script_enabled" value="0">');
 				$('body').append(form);
 				form.submit();
+			}
+		});
+
+		// Change container button
+		$('#tigsaw-change-container').on('click', function() {
+			$('#tigsaw-change-modal').removeClass('hidden').show();
+		});
+
+		// Modal close button
+		$('#tigsaw-modal-close, #tigsaw-modal-cancel').on('click', function() {
+			$('#tigsaw-change-modal').hide();
+			// Reset modal state
+			$('#tigsaw-modal-fetch-section').show();
+			$('#tigsaw-modal-loading').hide();
+			$('#tigsaw-modal-error').hide();
+			$('#tigsaw-modal-form').hide();
+			$('#tigsaw-modal-manual-section').hide();
+			$('#tigsaw-modal-activation-loading').hide();
+			$('#tigsaw-modal-activation-error').hide();
+		});
+
+		// Close modal on background click
+		$('#tigsaw-change-modal').on('click', function(e) {
+			if (e.target === this) {
+				$(this).hide();
+				// Reset modal state
+				$('#tigsaw-modal-fetch-section').show();
+				$('#tigsaw-modal-loading').hide();
+				$('#tigsaw-modal-error').hide();
+				$('#tigsaw-modal-form').hide();
+				$('#tigsaw-modal-manual-section').hide();
+				$('#tigsaw-modal-activation-loading').hide();
+				$('#tigsaw-modal-activation-error').hide();
 			}
 		});
 	});

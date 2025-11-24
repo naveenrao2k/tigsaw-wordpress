@@ -94,12 +94,7 @@ add_action( 'admin_menu', 'tigsaw_add_admin_menu' );
  * Enqueue admin styles and scripts
  */
 function tigsaw_admin_enqueue_scripts( $hook ) {
-	// Only load on our plugin's admin page
-	if ( 'toplevel_page_tigsaw-settings' !== $hook ) {
-		return;
-	}
-
-	// Enqueue admin CSS
+	// Enqueue admin CSS globally for menu icon
 	wp_enqueue_style(
 		'tigsaw-admin',
 		plugins_url( 'assets/css/admin.css', __FILE__ ),
@@ -107,6 +102,11 @@ function tigsaw_admin_enqueue_scripts( $hook ) {
 		TIGSAW_VERSION,
 		'all'
 	);
+
+	// Only load JS on our plugin's admin page
+	if ( 'toplevel_page_tigsaw-settings' !== $hook ) {
+		return;
+	}
 
 	// Enqueue admin JavaScript
 	wp_enqueue_script(
